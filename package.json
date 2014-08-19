@@ -11,6 +11,7 @@
   "dependencies": {
     "bluebird": "^2.3.0",
     "lodash": "^2.4.1",
-    "node-trello": "^0.1.5"
+    "node-trello": "^0.1.5",
+    "sprintf-js": "0.0.7"
   }
 }

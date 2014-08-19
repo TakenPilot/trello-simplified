@@ -1,21 +1,14 @@
 var Promise = require('bluebird'), 
   Trello = require("node-trello"),
   util = require('util'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    sprintf=require("sprintf-js").sprintf;
 
 var toGenerateKey = "https://trello.com/1/appKey/generate#";
 
 var t = Promise.promisifyAll(new Trello("23dafa7e5a201bbdff1ec66915ec1e2f", "218821ed25792c18bd61b38416810af30e0a399993290f83a30480860c8a1721"));
 
-function logPromiseResult (result) {
-  result.then(function (result) {
-    console.log(util.inspect(result, false, 7, true));
-  }).catch(function (err) {
-    console.log(util.inspect(err, false, 7, true));
-  });
-}
-
-logPromiseResult(t.getAsync("/1/members/me", { cards: "open" }).then(function (result) {
+t.getAsync("/1/members/me", { cards: "open" }).then(function (result) {
   var cards = _.map(result.cards, function (card) { return _.pick(card, ['id', 'name', 'url', 'idBoard', 'idList'])});
   var boardIds = _.uniq(_.pluck(cards, 'idBoard'));
   var listIds = _.uniq(_.pluck(cards, 'idList'));
@@ -45,5 +38,14 @@ logPromiseResult(t.getAsync("/1/members/me", { cards: "open" }).then(function (r
     'Design/Product signoff',
     'Design/Product Signoff'
   ]);
-}));
+}).then(function (groups) {
+  _.each(groups, function (group, name) {
+    console.log(sprintf(' %s ', name));
+    _.each(group, function (card) {
+      console.log(sprintf('  %s ', card.name));
+    });
+  });
+}).catch(function (err) {
+  console.log(util.inspect(err, false, 7, true));
+});
 
